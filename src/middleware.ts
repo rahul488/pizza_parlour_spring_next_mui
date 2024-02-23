@@ -4,9 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export { default } from 'next-auth/middleware';
 
 export async function middleware(request: NextRequest) {
-  const authToken = request.cookies.get('next-auth.session-token')?.value;
+  const authToken = request.cookies.get('__Secure-next-auth.session-token')?.value;
   const token: any = await getToken({ req: request });
-  console.log(request.nextUrl.pathname, token, 'kkk');
   const publicurl =
     request.nextUrl.pathname === '/' || request.nextUrl.pathname === '/signup';
 
@@ -35,4 +34,4 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-export const config = { matcher: ['/home/:path*', '/auth/:path*', '/'] };
+export const config = { matcher: ['/home/:path*', '/auth/:path*', '/',"/signup"] };
