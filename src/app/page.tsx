@@ -1,95 +1,115 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client';
+import AppTextField from '@/components/appForm/AppTextField';
+import useToast from '@/hooks/toast/useToast';
+import { LoginInitialValue } from '@/utils/schema/initialvalue';
+import { loginSchema } from '@/utils/schema/schema';
+import { Box, Button, Paper, Typography } from '@mui/material';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Form, FormProvider, useForm } from 'react-hook-form';
+import { signIn, useSession } from 'next-auth/react';
+import { useState } from 'react';
+import Loading from './loading';
 
-export default function Home() {
+const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const toast = useToast();
+  const { status, data: session } = useSession();
+  if (status === 'authenticated') {
+    const isAdmin = session?.user?.role.find(
+      (auth) => auth.authority === 'ROLE_ADMIN'
+    );
+    if (isAdmin) {
+      router.push('/auth');
+    } else {
+      router.push('/home');
+    }
+  }
+  const formProps = useForm({
+    mode: 'all',
+    resolver: loginSchema,
+    defaultValues: LoginInitialValue,
+  });
+  const onSubmit = async (values: { email: string; password: string }) => {
+    setLoading(true);
+    try {
+      const res: any = await signIn('credentials', {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
+      setLoading(false);
+      if (res?.ok) {
+        toast('Login Success', res?.ok);
+      } else {
+        toast('Login Error', res?.ok);
+      }
+    } catch (error: any) {
+      setLoading(false);
+      toast('Network Error', error.status);
+    }
+  };
+  if (loading) return <Loading />;
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <FormProvider {...formProps}>
+      <Box className='loginbox'>
+        <Form
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: '400px',
+            gap: '1rem',
+            position: 'relative',
+            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+            padding: '1rem 1rem',
+          }}
+          onSubmit={formProps.handleSubmit(onSubmit) as any}
+        >
+          <Typography variant='h4' textAlign='center'>
+            Login Here
+          </Typography>
+          <AppTextField name='email' type='text' label='Enter Your email' />
+          <AppTextField
+            name='password'
+            type='password'
+            label='Enter Your password'
+          />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: '1rem',
+              width: '100%',
+              alignItems: 'center',
+            }}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+            <Link
+              style={{ textDecoration: 'none', color: 'green' }}
+              href='/signup'
+            >
+              {`Don't have account ? Signup`}
+            </Link>
+            <Link href='/forgot-password' style={{ color: 'red' }}>
+              forgot password
+            </Link>
+          </Box>
+          <Box sx={{ width: '100%', marginTop: 'auto' }}>
+            <Button
+              type='submit'
+              color='success'
+              fullWidth
+              disabled={!formProps.formState.isValid}
+              variant='contained'
+            >
+              Submit
+            </Button>
+          </Box>
+        </Form>
+      </Box>
+    </FormProvider>
+  );
+};
+export default Login;

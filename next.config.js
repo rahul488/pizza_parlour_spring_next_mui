@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  images: {
+    domains: ['api.pizzahut.io', 'localhost'], // Add the domains where your images are hosted
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
