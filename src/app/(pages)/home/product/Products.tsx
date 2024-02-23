@@ -76,7 +76,7 @@ const Products = ({ productArr, categroy }: iProps) => {
   return (
     <Grid container spacing={2}>
       {currProductArr &&
-        currProductArr.content.map((product: any) => (
+        currProductArr.map((product: any) => (
           <Grid item xs={12} sm={6} md={3} key={product.id}>
             <Card
               sx={{
