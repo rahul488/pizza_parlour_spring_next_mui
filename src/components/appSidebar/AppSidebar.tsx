@@ -184,7 +184,11 @@ const CreateMenu = ({ text, icon, submenu, link = '' }: createMenuProps) => {
           </Box>
           {submenu && (
             <ListItemIcon
-              sx={{ justifyContent: 'flex-end', alignItems: 'center' }}
+              sx={{
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                cursor: 'pointer',
+              }}
               onClick={(e) => handleClick(e)}
             >
               {!toggle ? '\u2192' : '\u2193'}

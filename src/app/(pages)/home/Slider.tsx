@@ -5,6 +5,6 @@ import getData from '@/utils/services/ssrService';
 
 const Slider = async () => {
   const res = await getData(AUTH_APIS['getBanners']);
-  return <Box>{res && <SingleSlider banners={res?.data.content} />}</Box>;
+  return <Box>{res ? <SingleSlider banners={res?.data.content} /> : null}</Box>;
 };
 export default Slider;

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Form, FormProvider, useForm } from 'react-hook-form';
 import { signIn, useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Loading from './loading';
 
 const Login = () => {
@@ -16,16 +16,19 @@ const Login = () => {
   const router = useRouter();
   const toast = useToast();
   const { status, data: session } = useSession();
-  if (status === 'authenticated') {
-    const isAdmin = session?.user?.role.find(
-      (auth) => auth.authority === 'ROLE_ADMIN'
-    );
-    if (isAdmin) {
-      router.push('/auth');
-    } else {
-      router.push('/home');
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const isAdmin = session?.user?.role.find(
+        (auth) => auth.authority === 'ROLE_ADMIN'
+      );
+      if (isAdmin) {
+        router.push('/auth');
+      } else {
+        router.push('/home');
+      }
     }
-  }
+  }, [status, session]);
   const formProps = useForm({
     mode: 'all',
     resolver: loginSchema,
