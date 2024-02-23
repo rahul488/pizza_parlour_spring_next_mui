@@ -72,7 +72,7 @@ const Products = ({ productArr, categroy }: iProps) => {
       toast(res?.message, false);
     }
   };
-
+  console.log(currProductArr,'jjjj')
   return (
     <Grid container spacing={2}>
       {currProductArr &&
